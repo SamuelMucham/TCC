@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Tabela de Usuários (Técnicos e Gestores)
+model Usuario {
+  id            String         @id @default(uuid())
+  nome          String
+  email         String         @unique
+  senha         String
+  cargo         String         // ex: "GESTOR" ou "TECNICO"
+  criadoEm      DateTime       @default(now())
+  atualizadoEm  DateTime       @updatedAt
+
+  // Relacionamento: Um técnico pode ter várias ordens de serviço
+  ordensServico OrdemServico[]
+
+  @@map("usuarios") // Nome real da tabela no MySQL
+}
+
+// Tabela de Ordens de Serviço (OS)
+model OrdemServico {
+  id           String   @id @default(uuid())
+  clienteNome  String
+  equipamento  String
+  defeito      String
+  status       String   @default("ABERTA") // ABERTA, EM_ANALISE, CONCLUIDA, ENTREGUE
+  valor        Decimal? @db.Decimal(10, 2)
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  // Relacionamento com quem está consertando
+  tecnicoId    String?
+  tecnico      Usuario? @relation(fields: [tecnicoId], references: [id])
+
+  @@map("ordens_servico")
+}
