@@ -8,11 +8,9 @@ class CriarUsuarioController {
     const criarUsuarioService = new CriarUsuarioService();
 
     try {
-      // Executa a lógica de negócio
       const usuario = await criarUsuarioService.execute({ nome, email, senha, cargo });
       return res.status(201).json(usuario);
     } catch (error: any) {
-      // Se der erro (ex: e-mail duplicado), captura aqui e devolve pro front
       return res.status(400).json({ error: error.message });
     }
   }
